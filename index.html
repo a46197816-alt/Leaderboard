@@ -199,6 +199,21 @@
     transform: scale(0.98);
   }
 
+  .save-toast {
+    margin-top: 12px;
+    text-align: center;
+    color: #bae6fd;
+    font-size: 14px;
+    font-weight: 600;
+    min-height: 20px;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+
+  .save-toast.show {
+    opacity: 1;
+  }
+
 </style>
 </head>
 <body>
@@ -214,6 +229,7 @@
     <div class="save-wrap">
       <button class="save-btn" onclick="saveScores()">Save Scores</button>
     </div>
+    <div id="saveToast" class="save-toast">Scoreboard saved</div>
   </div>
 
 <script>
@@ -233,8 +249,22 @@
     }
   }
 
+  let toastTimer = null;
+
+  function showSaveToast() {
+    const toast = document.getElementById('saveToast');
+    if (!toast) return;
+
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+      toast.classList.remove('show');
+    }, 1500);
+  }
+
   function saveScores() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(clusters));
+    showSaveToast();
   }
 
   function loadScores() {
