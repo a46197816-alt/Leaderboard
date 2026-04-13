@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Global Cluster Competition</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --edu-color: #00d2ff;
+    --urb-color: #ff9f43;
+    --def-color: #ff4757;
+    --card-bg: rgba(255, 255, 255, 0.95);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  #logo{
+    position: relative;
+    overflow: hidden;
+    height: 100vh;
+    width: 100%;
+    padding: 80px 20px;
+  }
+
+  #logo::before{
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url("./Public Policy.png");
+    background-repeat: no-repeat;
+    background-size: 65% auto;
+    background-position: center center;
+    filter: none;
+    opacity: 0.5;
+    z-index: 0;
+  }
+
+  #logo > *{
+    position: relative;
+    z-index: 1;
+  }
+
+  body {
+    /* Better Background: Deep cinematic radial gradient with a subtle grid pattern */
+    background: 
+      radial-gradient(circle at center, #1e293b 0%, #0f172a 100%),
+      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: auto, 40px 40px, 40px 40px;
+    color: white;
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+   
+  }
+
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 84px;
+    text-align: center;
+    letter-spacing: 8px;
+    margin-bottom: 10px;
+    background: linear-gradient(to bottom, #fff, #94a3b8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 20px rgba(255,255,255,0.1));
+  }
+
+  .subtitle {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 5px;
+    color: #64748b;
+    margin-bottom: 60px;
+    text-align: center;
+  }
+
+  .leaderboard-container {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    width: 100%;
+    max-width: 1000px;
+    /* opacity: 0.5; */
+  }
+
+  /* High-fidelity card style */
+  .cluster-row {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 24px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    border-left: 8px solid transparent;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  /* Dynamic color coding for the left border */
+  .cluster-row[data-id="education"] { border-left-color: var(--edu-color); }
+  .cluster-row[data-id="urbanization"] { border-left-color: var(--urb-color); }
+  .cluster-row[data-id="defence"] { border-left-color: var(--def-color); }
+
+  .cluster-row:hover {
+    transform: scale(1.02);
+    background: #ffffff;
+  }
+
+  .cluster-info {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+  }
+
+  .rank-number {
+    font-size: 32px;
+    font-weight: 800;
+    color: #cbd5e1;
+    font-style: italic;
+  }
+
+  .cluster-name {
+    font-size: 32px;
+    font-weight: 800;
+    color: #1e293b;
+    letter-spacing: -1px;
+  }
+
+  .score-display {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 64px;
+    line-height: 1;
+    min-width: 120px;
+    text-align: right;
+  }
+
+  /* Score Colors */
+  .edu-score { color: var(--edu-color); text-shadow: 0 0 10px rgba(0, 210, 255, 0.2); }
+  .urb-score { color: var(--urb-color); text-shadow: 0 0 10px rgba(255, 159, 67, 0.2); }
+  .def-score { color: var(--def-color); text-shadow: 0 0 10px rgba(255, 71, 87, 0.2); }
+
+  /* Buttons matched to your first screenshot */
+  .controls {
+    display: flex;
+    gap: 10px;
+  }
+
+  .btn {
+    width: 55px;
+    height: 50px;
+    border: 1px solid #e2e8f0;
+    background: white;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+    border-color: #94a3b8;
+  }
+
+  .btn:active {
+    transform: scale(0.95);
+  }
+
+</style>
+</head>
+<body>
+  <div id="logo">
+    <h1 style="display: inline; margin-left:100px;">Inter-Cluster Policy Competition</h1>
+    
+    <div class="subtitle">Public Policy Club</div>
+    
+    <div style="display: flex; align-items: center; justify-content: center;">
+      <div class="leaderboard-container" id="leaderboard">
+      </div>
+  </div>
+  </div>
+
+<script>
+  let clusters = [
+    { id: 'education', name: 'EDUCATION', score: 8, class: 'edu-score' },
+    { id: 'urbanization', name: 'URBANIZATION', score: 6, class: 'urb-score' },
+    { id: 'defence', name: 'DEFENCE', score: 5, class: 'def-score' }
+  ];
+
+  function updateScore(id, amount) {
+    const cluster = clusters.find(c => c.id === id);
+    if (cluster) {
+      cluster.score = Math.max(0, cluster.score + amount);
+      render();
+    }
+  }
+
+  function render() {
+    const container = document.getElementById('leaderboard');
+    // Sorting: High score stays at the top
+    const sorted = [...clusters].sort((a, b) => b.score - a.score);
+
+    container.innerHTML = sorted.map((c, index) => `
+      <div class="cluster-row" data-id="${c.id}">
+        <div class="cluster-info">
+          <div class="rank-number">#${index + 1}</div>
+          <div class="cluster-name">${c.name}</div>
+        </div>
+        
+        <div class="score-display ${c.class}">${c.score}</div>
+
+        <div class="controls">
+          <button class="btn" onclick="updateScore('${c.id}', -5)">-5</button>
+          <button class="btn" onclick="updateScore('${c.id}', -1)">-1</button>
+          <button class="btn" onclick="updateScore('${c.id}', 1)">+1</button>
+          <button class="btn" onclick="updateScore('${c.id}', 5)">+5</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  render();
+</script>
+
+</body>
+</html>
