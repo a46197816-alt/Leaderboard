@@ -27,7 +27,7 @@
     content: "";
     position: absolute;
     inset: 0;
-    background-image: url("./Public Policy.png");
+    background-image: url("./Public%20Policy.png");
     background-repeat: no-repeat;
     background-size: 65% auto;
     background-position: center center;
@@ -172,6 +172,33 @@
     transform: scale(0.95);
   }
 
+  .save-wrap {
+    display: flex;
+    justify-content: center;
+    margin-top: 24px;
+  }
+
+  .save-btn {
+    min-width: 180px;
+    height: 48px;
+    border: 1px solid #cbd5e1;
+    background: #0ea5e9;
+    color: #ffffff;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .save-btn:hover {
+    background: #0284c7;
+  }
+
+  .save-btn:active {
+    transform: scale(0.98);
+  }
+
 </style>
 </head>
 <body>
@@ -183,10 +210,15 @@
     <div style="display: flex; align-items: center; justify-content: center;">
       <div class="leaderboard-container" id="leaderboard">
       </div>
-  </div>
+    </div>
+    <div class="save-wrap">
+      <button class="save-btn" onclick="saveScores()">Save Scores</button>
+    </div>
   </div>
 
 <script>
+  const STORAGE_KEY = 'leaderboard_clusters_scores_v1';
+
   let clusters = [
     { id: 'education', name: 'EDUCATION', score: 8, class: 'edu-score' },
     { id: 'urbanization', name: 'URBANIZATION', score: 6, class: 'urb-score' },
@@ -198,6 +230,28 @@
     if (cluster) {
       cluster.score = Math.max(0, cluster.score + amount);
       render();
+    }
+  }
+
+  function saveScores() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(clusters));
+  }
+
+  function loadScores() {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (!saved) return;
+
+    try {
+      const parsed = JSON.parse(saved);
+      if (!Array.isArray(parsed)) return;
+
+      const scoreMap = new Map(parsed.map(item => [item.id, item.score]));
+      clusters = clusters.map(c => ({
+        ...c,
+        score: Number.isFinite(scoreMap.get(c.id)) ? Math.max(0, scoreMap.get(c.id)) : c.score
+      }));
+    } catch (e) {
+      console.error('Failed to load saved scores:', e);
     }
   }
 
@@ -225,6 +279,7 @@
     `).join('');
   }
 
+  loadScores();
   render();
 </script>
 
